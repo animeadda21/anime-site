@@ -51,13 +51,15 @@
     <div class="slide" data-product="naruto">
       <h3>Naruto Figure</h3>
       <p>Top selling collectible</p>
-      <a class="btn" href="https://www.amazon.in/dp/B0FZ9JG3FZ?tag=animeadda21" target="_blank" onclick="trackClick('naruto')">Buy Now</a>
+      <a class="btn" href="https://www.amazon.in/dp/B0FZ9JG3FZ?tag=animeadda21" target="_blank" onclick="trackClick('naruto')"><a href="#">Buy Now</a>
     </div>
 
     <div class="slide" data-product="gojo">
       <h3>Gojo Poster</h3>
       <p>Trending wall art</p>
-      <a class="btn" href="https://www.amazon.in/dp/B0FZ9JG3FZ?tag=animeadda21" target="_blank" onclick="trackClick('gojo')">Buy Now</a>
+      <a class="btn" href="https://www.amazon.in/dp/B0FZ9JG3FZ?tag=animeadda21" target="_blank" onclick="trackClick('gojo')"><a href="https://www.amazon.in/dp/PRODUCT_ID?tag=animeadda21-21" target="_blank" class="buy-btn">
+  Buy Now
+</a>
     </div>
 
     <div class="slide" data-product="hoodie">
