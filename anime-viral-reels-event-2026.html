@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔥 Anime Viral Reels & Edit Contest 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --red: #ff1744;
+    --purple: #9c27b0;
+    --neon-red: #ff4081;
+    --neon-purple: #ce93d8;
+    --glow-red: rgba(255,23,68,0.4);
+    --glow-purple: rgba(156,39,176,0.4);
+    --dark-bg: #080010;
+    --card-bg: rgba(255,255,255,0.04);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: #080010;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ANIMATIONS */
+  @keyframes flicker {
+    0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:0.7} 95%{opacity:1} 97%{opacity:0.8}
+  }
+  @keyframes pulse-red {
+    0%,100%{box-shadow:0 0 20px var(--glow-red),0 0 40px rgba(255,23,68,0.2)}
+    50%{box-shadow:0 0 35px var(--glow-red),0 0 70px rgba(255,23,68,0.35)}
+  }
+  @keyframes pulse-purple {
+    0%,100%{box-shadow:0 0 20px var(--glow-purple)}
+    50%{box-shadow:0 0 40px var(--glow-purple),0 0 80px rgba(156,39,176,0.3)}
+  }
+  @keyframes energyFlow {
+    0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
+  }
+  @keyframes float {
+    0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)}
+  }
+  @keyframes lightning {
+    0%,100%{opacity:0} 5%,15%{opacity:1} 10%,20%{opacity:0}
+  }
+  @keyframes spin {
+    from{transform:rotate(0deg)} to{transform:rotate(360deg)}
+  }
+  @keyframes particleDrift {
+    0%{transform:translateY(0) translateX(0);opacity:0.9}
+    100%{transform:translateY(-80px) translateX(var(--dx));opacity:0}
+  }
+  @keyframes scanline {
+    0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)}
+  }
+  @keyframes borderGlow {
+    0%,100%{border-color:rgba(255,23,68,0.4)} 50%{border-color:rgba(156,39,176,0.6)}
+  }
+  @keyframes glitchA {
+    0%,100%{clip-path:inset(0 0 95% 0);transform:translate(-2px,0)}
+    20%{clip-path:inset(40% 0 50% 0);transform:translate(2px,0)}
+    40%{clip-path:inset(70% 0 20% 0);transform:translate(-1px,0)}
+    60%{clip-path:inset(20% 0 70% 0);transform:translate(1px,0)}
+    80%{clip-path:inset(80% 0 10% 0);transform:translate(-2px,0)}
+  }
+  @keyframes glitchB {
+    0%,100%{clip-path:inset(80% 0 0 0);transform:translate(2px,0)}
+    20%{clip-path:inset(5% 0 85% 0);transform:translate(-2px,0)}
+    40%{clip-path:inset(45% 0 45% 0);transform:translate(1px,0)}
+    60%{clip-path:inset(90% 0 5% 0);transform:translate(-1px,0)}
+    80%{clip-path:inset(10% 0 80% 0);transform:translate(2px,0)}
+  }
+  @keyframes timerTick {
+    0%,49%{border-color:rgba(255,23,68,0.5)} 50%,100%{border-color:rgba(156,39,176,0.5)}
+  }
+  @keyframes fadeInUp {
+    from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)}
+  }
+  @keyframes slideInLeft {
+    from{opacity:0;transform:translateX(-24px)} to{opacity:1;transform:translateX(0)}
+  }
+  @keyframes slideInRight {
+    from{opacity:0;transform:translateX(24px)} to{opacity:1;transform:translateX(0)}
+  }
+
+  /* SCANLINE */
+  .scanline-overlay {
+    position: fixed; top:0; left:0; right:0; bottom:0;
+    background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);
+    pointer-events: none; z-index: 9999;
+  }
+
+  /* PARTICLES */
+  .particles { position:fixed; inset:0; pointer-events:none; z-index:10; overflow:hidden; }
+  .particle {
+    position:absolute; border-radius:50%;
+    animation: particleDrift linear infinite;
+  }
+
+  /* ENERGY BAR */
+  .energy-bar {
+    height: 3px;
+    background: linear-gradient(90deg,var(--red),var(--purple),var(--neon-red),var(--purple),var(--red));
+    background-size: 300% auto;
+    animation: energyFlow 2s linear infinite;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    background: linear-gradient(160deg, #0d0020 0%, #1a0035 45%, #0a000f 100%);
+    padding: 60px 40px 48px;
+    text-align: center;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255,23,68,0.25);
+  }
+  .hero::before {
+    content:''; position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(156,39,176,0.3) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 10% 110%, rgba(255,23,68,0.2) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 90% 110%, rgba(255,23,68,0.2) 0%, transparent 60%);
+    pointer-events:none;
+  }
+
+  .lb { position:absolute; width:2px; background:linear-gradient(180deg,transparent,#ff4081,transparent); animation:lightning 3s infinite; opacity:0; }
+  .lb1{height:140px;top:8%;left:12%;animation-delay:0s;}
+  .lb2{height:100px;top:15%;right:18%;animation-delay:1.4s;}
+  .lb3{height:180px;top:4%;left:48%;animation-delay:2.2s;}
+  .lb4{height:80px;top:30%;left:30%;animation-delay:0.8s;}
+
+  .live-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(255,23,68,0.12); border:1px solid rgba(255,23,68,0.5);
+    border-radius:20px; padding:7px 20px; margin-bottom:24px;
+    animation:pulse-red 2s ease-in-out infinite;
+    font-family:'Orbitron',monospace; font-size:11px; font-weight:700;
+    letter-spacing:3px; color:var(--red); text-transform:uppercase;
+  }
+  .live-dot { width:8px; height:8px; background:var(--red); border-radius:50%; animation:flicker 1.5s infinite; box-shadow:0 0 8px var(--red); }
+
+  .glitch-wrap { position:relative; display:inline-block; margin-bottom:12px; }
+  .hero-title {
+    font-family:'Bebas Neue',cursive;
+    font-size: clamp(48px,8vw,80px);
+    line-height:1; letter-spacing:5px;
+    background:linear-gradient(135deg,#ff4081 0%,#ff1744 30%,#ce93d8 70%,#9c27b0 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    filter:drop-shadow(0 0 24px rgba(255,23,68,0.5));
+    animation:flicker 4s infinite;
+    position:relative; z-index:1;
+  }
+  .glitch-a,.glitch-b {
+    position:absolute; top:0; left:0; right:0;
+    font-family:'Bebas Neue',cursive;
+    font-size:clamp(48px,8vw,80px);
+    line-height:1; letter-spacing:5px;
+    background:linear-gradient(135deg,#ff4081 0%,#ff1744 30%,#ce93d8 70%,#9c27b0 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    opacity:0.6;
+  }
+  .glitch-a { animation:glitchA 6s infinite; }
+  .glitch-b { animation:glitchB 6s infinite 0.4s; }
+
+  .hero-subtitle {
+    font-family:'Orbitron',monospace; font-size:12px;
+    color:rgba(255,255,255,0.4); letter-spacing:7px; text-transform:uppercase;
+    margin-bottom:28px;
+  }
+
+  .hero-chips {
+    display:flex; justify-content:center; gap:20px; flex-wrap:wrap;
+  }
+  .hero-chip {
+    display:flex; align-items:center; gap:7px;
+    font-size:13px; color:rgba(255,255,255,0.65);
+    font-weight:600; letter-spacing:0.5px;
+  }
+  .hc-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  .hc-red { background:var(--red); box-shadow:0 0 6px var(--red); }
+  .hc-purple { background:#9c27b0; box-shadow:0 0 6px #9c27b0; }
+  .hc-pink { background:#ff4081; box-shadow:0 0 6px #ff4081; }
+
+  /* COUNTDOWN */
+  .countdown-section {
+    background:rgba(0,0,0,0.55);
+    border-bottom:1px solid rgba(156,39,176,0.2);
+    padding:28px 40px; text-align:center;
+  }
+  .cd-label {
+    font-family:'Orbitron',monospace; font-size:10px; letter-spacing:5px;
+    color:rgba(255,255,255,0.3); text-transform:uppercase; margin-bottom:16px;
+  }
+  .cd-units { display:flex; justify-content:center; align-items:center; gap:16px; }
+  .cd-unit { text-align:center; }
+  .cd-num {
+    font-family:'Bebas Neue',cursive; font-size:52px; line-height:1;
+    background:linear-gradient(180deg,#ff4081,#9c27b0);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    display:block;
+    border:1px solid rgba(255,23,68,0.3); border-radius:10px;
+    padding:6px 18px; min-width:80px;
+    animation:timerTick 2s infinite;
+  }
+  .cd-sub { font-family:'Orbitron',monospace; font-size:9px; color:rgba(255,255,255,0.3); letter-spacing:2px; margin-top:6px; text-transform:uppercase; }
+  .cd-sep { font-family:'Bebas Neue'; font-size:44px; color:rgba(255,23,68,0.45); animation:flicker 1s infinite; padding-bottom:20px; }
+
+  /* NAV */
+  .nav {
+    position: sticky; top:0; z-index:100;
+    background:rgba(8,0,16,0.95); backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,23,68,0.2);
+    display:flex; overflow-x:auto; padding:0 24px; gap:0;
+    scrollbar-width:none;
+  }
+  .nav::-webkit-scrollbar { display:none; }
+  .nav-btn {
+    flex-shrink:0; padding:16px 22px;
+    font-family:'Orbitron',monospace; font-size:10px; font-weight:700;
+    letter-spacing:2px; text-transform:uppercase;
+    color:rgba(255,255,255,0.3);
+    border:none; background:transparent;
+    border-bottom:2px solid transparent;
+    cursor:pointer; transition:all 0.2s; white-space:nowrap;
+    text-decoration:none; display:inline-flex; align-items:center;
+  }
+  .nav-btn:hover { color:rgba(255,255,255,0.7); }
+  .nav-btn.active { color:var(--red); border-bottom-color:var(--red); text-shadow:0 0 14px rgba(255,23,68,0.7); }
+
+  /* SECTIONS */
+  .section { padding:60px 40px; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .section:nth-child(even) { background:rgba(255,255,255,0.01); }
+
+  .sec-tag {
+    font-family:'Orbitron',monospace; font-size:9px; font-weight:700;
+    letter-spacing:5px; text-transform:uppercase; color:var(--neon-purple);
+    display:block; margin-bottom:10px;
+  }
+  .sec-title {
+    font-family:'Bebas Neue',cursive; font-size:clamp(36px,5vw,52px);
+    letter-spacing:4px; color:#fff; line-height:1;
+  }
+  .sec-title span { color:var(--red); }
+  .sec-line { width:52px; height:2px; background:linear-gradient(90deg,var(--red),var(--purple)); border-radius:2px; margin-top:14px; }
+
+  /* WELCOME BLAST */
+  .welcome-blast {
+    background:linear-gradient(135deg,rgba(255,23,68,0.08),rgba(156,39,176,0.08));
+    border:1px solid rgba(255,23,68,0.3);
+    border-radius:16px; padding:28px 32px; margin-top:28px;
+    position:relative; overflow:hidden;
+    animation:pulse-red 3s ease-in-out infinite;
+  }
+  .welcome-blast::before {
+    content:''; position:absolute;
+    top:0; left:-100%; width:50%; height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);
+    animation:scanline 4s linear infinite;
+  }
+  .wb-text {
+    font-family:'Bebas Neue',cursive; font-size:36px; letter-spacing:5px;
+    background:linear-gradient(135deg,#fff,#ce93d8);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    display:block; margin-bottom:10px;
+    animation:float 3s ease-in-out infinite;
+  }
+  .wb-sub { font-size:16px; color:rgba(255,255,255,0.55); line-height:1.7; font-weight:600; }
+
+  /* HOST GRID */
+  .host-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px; margin-top:28px;
+  }
+  .host-chip {
+    display:flex; align-items:center; gap:14px;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px; padding:16px 18px;
+    transition:border-color 0.2s;
+  }
+  .host-chip:hover { border-color:rgba(255,23,68,0.4); }
+  .hc-icon { font-size:24px; flex-shrink:0; }
+  .hc-text { font-size:13px; font-weight:700; color:rgba(255,255,255,0.65); letter-spacing:0.5px; line-height:1.4; }
+
+  /* SHOWCASE */
+  .showcase-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:16px; margin-top:28px;
+  }
+  .showcase-card {
+    background:var(--card-bg); border:1px solid rgba(255,255,255,0.07);
+    border-radius:14px; overflow:hidden;
+    transition:transform 0.2s,border-color 0.2s;
+    animation:fadeInUp 0.5s ease both;
+  }
+  .showcase-card:hover { transform:translateY(-4px); border-color:rgba(255,23,68,0.4); }
+  .showcase-card:nth-child(2){animation-delay:0.1s}
+  .showcase-card:nth-child(3){animation-delay:0.2s}
+  .showcase-card:nth-child(4){animation-delay:0.3s}
+  .card-vis {
+    height:100px; display:flex; align-items:center; justify-content:center;
+    font-size:44px; position:relative; overflow:hidden;
+  }
+  .card-vis::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.7)); }
+  .bg-naruto { background:linear-gradient(135deg,#ff6600,#ff0000,#1a0010); }
+  .bg-asta { background:linear-gradient(135deg,#2d0040,#7b1fa2,#1a0010); }
+  .bg-gojo { background:linear-gradient(135deg,#0d47a1,#9c27b0,#1a0010); }
+  .bg-shisui { background:linear-gradient(135deg,#880000,#ff1744,#1a0010); }
+  .card-info { padding:14px 18px 18px; }
+  .card-name { font-family:'Bebas Neue',cursive; font-size:20px; letter-spacing:2px; color:#fff; }
+  .card-desc { font-size:13px; color:rgba(255,255,255,0.4); margin-top:4px; line-height:1.5; }
+  .card-tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+  .ctag {
+    font-size:9px; font-weight:700; letter-spacing:1px;
+    padding:4px 10px; border-radius:5px; text-transform:uppercase;
+  }
+  .ct-red { background:rgba(255,23,68,0.2); color:#ff4081; border:1px solid rgba(255,23,68,0.3); }
+  .ct-purple { background:rgba(156,39,176,0.2); color:#ce93d8; border:1px solid rgba(156,39,176,0.3); }
+  .ct-white { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.1); }
+
+  /* POLLS */
+  .polls-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; margin-top:28px; }
+  .poll-card {
+    background:var(--card-bg); border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px; overflow:hidden;
+  }
+  .poll-hdr { padding:14px 20px 10px; border-bottom:1px solid rgba(255,255,255,0.05); font-family:'Orbitron',monospace; font-size:9px; color:rgba(255,255,255,0.3); letter-spacing:3px; text-transform:uppercase; }
+  .poll-q { padding:16px 20px; font-size:17px; font-weight:700; color:#fff; letter-spacing:0.5px; line-height:1.4; }
+  .poll-opts { padding:0 20px 20px; display:flex; flex-direction:column; gap:10px; }
+  .poll-opt {
+    position:relative; border-radius:10px; overflow:hidden;
+    cursor:pointer; border:1px solid rgba(255,255,255,0.08);
+    transition:border-color 0.2s;
+  }
+  .poll-opt:hover { border-color:rgba(255,23,68,0.5); }
+  .poll-opt.voted { border-color:var(--red); }
+  .pf { position:absolute; left:0; top:0; bottom:0; transition:width 0.8s cubic-bezier(0.4,0,0.2,1); }
+  .pf-red { background:linear-gradient(90deg,rgba(255,23,68,0.3),rgba(255,23,68,0.1)); }
+  .pf-purple { background:linear-gradient(90deg,rgba(156,39,176,0.3),rgba(156,39,176,0.1)); }
+  .pc { position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; padding:12px 16px; }
+  .pc-label { display:flex; align-items:center; gap:10px; font-size:15px; font-weight:700; color:rgba(255,255,255,0.85); }
+  .pc-emoji { font-size:20px; }
+  .pc-pct { font-family:'Bebas Neue',cursive; font-size:22px; color:rgba(255,255,255,0.35); }
+  .poll-opt.voted .pc-pct { color:var(--red); }
+
+  /* ENGAGE */
+  .engage-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-top:28px; }
+  .engage-btn {
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px; padding:20px 14px; text-align:center;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .engage-btn:hover { background:rgba(255,23,68,0.1); border-color:rgba(255,23,68,0.4); transform:translateY(-3px); }
+  .engage-btn:active { transform:scale(0.97); }
+  .eb-icon { font-size:28px; display:block; margin-bottom:8px; }
+  .eb-label { font-size:11px; font-weight:700; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:1.5px; }
+
+  /* GROWTH */
+  .growth-list { display:flex; flex-direction:column; gap:16px; margin-top:28px; }
+  .growth-item {
+    display:flex; gap:16px; align-items:flex-start;
+    background:var(--card-bg); border:1px solid rgba(255,255,255,0.06);
+    border-radius:14px; padding:20px;
+    animation:slideInLeft 0.5s ease both;
+    transition:border-color 0.2s;
+  }
+  .growth-item:hover { border-color:rgba(156,39,176,0.4); }
+  .growth-item:nth-child(2){animation-delay:0.1s}
+  .growth-item:nth-child(3){animation-delay:0.2s}
+  .growth-item:nth-child(4){animation-delay:0.3s}
+  .growth-item:nth-child(5){animation-delay:0.4s}
+  .gi-num {
+    width:42px; height:42px; border-radius:10px; flex-shrink:0;
+    background:linear-gradient(135deg,rgba(255,23,68,0.25),rgba(156,39,176,0.25));
+    border:1px solid rgba(255,23,68,0.35);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Bebas Neue',cursive; font-size:20px; color:var(--red);
+  }
+  .gi-body h4 { font-size:16px; font-weight:700; color:#fff; margin-bottom:5px; letter-spacing:0.5px; }
+  .gi-body p { font-size:14px; color:rgba(255,255,255,0.45); line-height:1.6; }
+
+  .apps-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:24px; }
+  .app-pill {
+    display:flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+    border-radius:20px; padding:9px 18px;
+    font-size:14px; font-weight:700; color:rgba(255,255,255,0.65);
+    transition:all 0.2s; cursor:default;
+  }
+  .app-pill:hover { border-color:rgba(156,39,176,0.5); color:#ce93d8; }
+  .ap-dot { width:8px; height:8px; border-radius:50%; }
+
+  /* CONTEST */
+  .contest-cats { display:flex; flex-direction:column; gap:12px; margin-top:28px; }
+  .contest-cat {
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--card-bg); border:1px solid rgba(255,255,255,0.06);
+    border-left:3px solid transparent; border-radius:12px; padding:18px 20px;
+    transition:all 0.2s; animation:slideInRight 0.5s ease both;
+  }
+  .contest-cat:hover { border-right-color:rgba(255,23,68,0.4); border-top-color:rgba(255,23,68,0.4); border-bottom-color:rgba(255,23,68,0.4); transform:translateX(4px); }
+  .contest-cat:nth-child(1){border-left-color:rgba(255,102,0,0.7); animation-delay:0s;}
+  .contest-cat:nth-child(2){border-left-color:rgba(74,0,112,0.9); animation-delay:0.1s;}
+  .contest-cat:nth-child(3){border-left-color:rgba(13,71,161,0.9); animation-delay:0.2s;}
+  .contest-cat:nth-child(4){border-left-color:rgba(255,64,129,0.7); animation-delay:0.3s;}
+  .contest-cat:nth-child(5){border-left-color:rgba(156,39,176,0.7); animation-delay:0.4s;}
+  .cc-left { display:flex; align-items:center; gap:16px; }
+  .cc-icon { font-size:28px; }
+  .cc-name { font-size:16px; font-weight:700; color:#fff; letter-spacing:0.5px; }
+  .cc-sub { font-size:12px; color:rgba(255,255,255,0.35); margin-top:3px; }
+  .cc-badge {
+    font-family:'Bebas Neue',cursive; font-size:14px; letter-spacing:2px;
+    color:var(--red); background:rgba(255,23,68,0.1); border:1px solid rgba(255,23,68,0.35);
+    border-radius:6px; padding:5px 12px; white-space:nowrap;
+  }
+
+  .submit-btn {
+    display:block; width:100%; margin-top:24px;
+    background:linear-gradient(135deg,var(--red),#9c27b0);
+    border:none; border-radius:14px; padding:18px 24px;
+    cursor:pointer; font-family:'Bebas Neue',cursive; font-size:20px;
+    letter-spacing:4px; color:#fff; text-transform:uppercase;
+    position:relative; overflow:hidden;
+    transition:transform 0.15s,filter 0.15s;
+    animation:pulse-purple 3s ease-in-out infinite;
+  }
+  .submit-btn::before {
+    content:''; position:absolute; top:-50%; left:-100%; width:60%; height:200%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+    transition:left 0.5s;
+  }
+  .submit-btn:hover::before { left:150%; }
+  .submit-btn:hover { filter:brightness(1.15); transform:translateY(-2px); }
+  .submit-btn:active { transform:scale(0.98); }
+
+  /* FINALE */
+  .finale-hero {
+    background:linear-gradient(135deg,rgba(255,23,68,0.1),rgba(156,39,176,0.12));
+    border:1px solid rgba(255,23,68,0.35); border-radius:20px;
+    padding:48px 32px; text-align:center; position:relative; overflow:hidden;
+    margin-top:28px; animation:borderGlow 3s ease-in-out infinite;
+  }
+  .finale-hero::before {
+    content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%;
+    background:conic-gradient(from 0deg,transparent 0deg,rgba(255,23,68,0.06) 60deg,transparent 120deg);
+    animation:spin 10s linear infinite;
+  }
+  .finale-words {
+    position:relative; z-index:1;
+    font-family:'Bebas Neue',cursive; font-size:clamp(32px,6vw,56px);
+    letter-spacing:8px; line-height:1.4;
+    background:linear-gradient(135deg,#ff4081,#ce93d8,#ff4081);
+    background-size:200% auto;
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    animation:energyFlow 3s linear infinite;
+  }
+
+  .promo-links { display:flex; flex-direction:column; gap:12px; margin-top:28px; }
+  .promo-link {
+    display:flex; align-items:center; gap:16px;
+    background:var(--card-bg); border:1px solid rgba(255,255,255,0.07);
+    border-radius:14px; padding:16px 20px;
+    cursor:pointer; transition:all 0.2s; text-decoration:none; color:inherit;
+  }
+  .promo-link:hover { border-color:rgba(255,23,68,0.4); background:rgba(255,23,68,0.06); transform:translateX(4px); }
+  .pl-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+  .pi-fb { background:rgba(24,119,242,0.2); }
+  .pi-tg { background:rgba(0,136,204,0.2); }
+  .pi-next { background:rgba(255,23,68,0.2); }
+  .pl-text h4 { font-size:15px; font-weight:700; color:#fff; }
+  .pl-text p { font-size:12px; color:rgba(255,255,255,0.38); margin-top:3px; }
+  .pl-arrow { margin-left:auto; color:rgba(255,255,255,0.2); font-size:22px; }
+
+  /* FOOTER */
+  .footer {
+    background:#040008; border-top:1px solid rgba(255,23,68,0.2);
+    padding:32px 40px; text-align:center;
+  }
+  .footer-logo {
+    font-family:'Bebas Neue',cursive; font-size:24px; letter-spacing:4px;
+    background:linear-gradient(135deg,var(--red),var(--purple));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    margin-bottom:8px;
+  }
+  .footer-sub { font-size:12px; color:rgba(255,255,255,0.25); letter-spacing:2px; font-family:'Orbitron',monospace; }
+
+  /* UTILITY */
+  .max-w { max-width:960px; margin:0 auto; }
+  @media(max-width:600px) {
+    .hero { padding:40px 20px 32px; }
+    .section { padding:44px 20px; }
+    .cd-num { font-size:38px; min-width:60px; padding:4px 12px; }
+    .nav-btn { padding:14px 16px; font-size:9px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scanline-overlay"></div>
+<div class="particles" id="particles"></div>
+
+<div class="energy-bar"></div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="lb lb1"></div>
+  <div class="lb lb2"></div>
+  <div class="lb lb3"></div>
+  <div class="lb lb4"></div>
+  <div class="max-w">
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      Virtual Facebook Live Event
+    </div>
+    <div class="glitch-wrap">
+      <div class="hero-title">Anime Viral Reels<br>&amp; Edit Contest 2026</div>
+      <div class="glitch-a" aria-hidden="true">Anime Viral Reels<br>&amp; Edit Contest 2026</div>
+      <div class="glitch-b" aria-hidden="true">Anime Viral Reels<br>&amp; Edit Contest 2026</div>
+    </div>
+    <div class="hero-subtitle">The Ultimate Anime Creator Festival</div>
+    <div class="hero-chips">
+      <div class="hero-chip"><span class="hc-dot hc-red"></span> 2026 Edition</div>
+      <div class="hero-chip"><span class="hc-dot hc-purple"></span> Virtual · Facebook Live</div>
+      <div class="hero-chip"><span class="hc-dot hc-pink"></span> All Anime Creators Welcome</div>
+    </div>
+  </div>
+</section>
+
+<!-- COUNTDOWN -->
+<div class="countdown-section">
+  <div class="max-w">
+    <div class="cd-label">Event Goes Live In</div>
+    <div class="cd-units">
+      <div class="cd-unit"><span class="cd-num" id="cd-days">07</span><div class="cd-sub">Days</div></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit"><span class="cd-num" id="cd-hours">14</span><div class="cd-sub">Hours</div></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit"><span class="cd-num" id="cd-mins">32</span><div class="cd-sub">Mins</div></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit"><span class="cd-num" id="cd-secs">00</span><div class="cd-sub">Secs</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="max-w" style="display:flex;width:100%">
+    <a class="nav-btn active" href="#intro" onclick="setActive(this)">01 · Intro</a>
+    <a class="nav-btn" href="#showcase" onclick="setActive(this)">02 · Showcase</a>
+    <a class="nav-btn" href="#interact" onclick="setActive(this)">03 · Interact</a>
+    <a class="nav-btn" href="#growth" onclick="setActive(this)">04 · Growth</a>
+    <a class="nav-btn" href="#contest" onclick="setActive(this)">05 · Contest</a>
+    <a class="nav-btn" href="#finale" onclick="setActive(this)">06 · Finale</a>
+  </div>
+</nav>
+
+<!-- SECTION 1: INTRO -->
+<section class="section" id="intro">
+  <div class="max-w">
+    <span class="sec-tag">Phase 01 · Opening</span>
+    <div class="sec-title">Welcome <span>Anime</span> Creators 🔥</div>
+    <div class="sec-line"></div>
+    <div class="welcome-blast">
+      <span class="wb-text">⚡ WELCOME ANIME CREATORS 🔥</span>
+      <p class="wb-sub">The most hype virtual anime creator festival of 2026 is HERE. Get your edits ready. The community is watching. The stage is yours. No facecam. No gatekeeping. Pure anime energy.</p>
+    </div>
+    <div class="host-grid">
+      <div class="host-chip"><span class="hc-icon">🎬</span><div class="hc-text">Anime Visuals & Text Overlays</div></div>
+      <div class="host-chip"><span class="hc-icon">🤖</span><div class="hc-text">AI Voice & Background Music</div></div>
+      <div class="host-chip"><span class="hc-icon">⚡</span><div class="hc-text">Lightning & Energy Effects</div></div>
+      <div class="host-chip"><span class="hc-icon">🎭</span><div class="hc-text">100% Faceless Creator Style</div></div>
+      <div class="host-chip"><span class="hc-icon">🔥</span><div class="hc-text">Cinematic Dark Music & Bass</div></div>
+      <div class="host-chip"><span class="hc-icon">🌀</span><div class="hc-text">Beat Sync Transitions</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: SHOWCASE -->
+<section class="section" id="showcase">
+  <div class="max-w">
+    <span class="sec-tag">Phase 02 · Viral Showcase</span>
+    <div class="sec-title">Viral <span>Anime</span> Edits</div>
+    <div class="sec-line"></div>
+    <div class="showcase-grid">
+      <div class="showcase-card">
+        <div class="card-vis bg-naruto">🍃⚡🌀</div>
+        <div class="card-info">
+          <div class="card-name">Naruto Uzumaki Edits</div>
+          <div class="card-desc">Sage Mode · Nine-Tails · Baryon Mode transformations with full cinematic energy</div>
+          <div class="card-tags">
+            <span class="ctag ct-red">Slow Motion</span>
+            <span class="ctag ct-purple">Beat Sync</span>
+            <span class="ctag ct-white">Shake FX</span>
+            <span class="ctag ct-red">Glow</span>
+          </div>
+        </div>
+      </div>
+      <div class="showcase-card">
+        <div class="card-vis bg-asta">🐂⚫💜</div>
+        <div class="card-info">
+          <div class="card-name">Asta Demon Edits</div>
+          <div class="card-desc">Black Asta · Anti-Magic · Devil Union mode with dark aura and power effects</div>
+          <div class="card-tags">
+            <span class="ctag ct-purple">Aura FX</span>
+            <span class="ctag ct-white">Motion Blur</span>
+            <span class="ctag ct-red">Particles</span>
+          </div>
+        </div>
+      </div>
+      <div class="showcase-card">
+        <div class="card-vis bg-gojo">♾️👁️💙</div>
+        <div class="card-info">
+          <div class="card-name">Gojo Satoru Edits</div>
+          <div class="card-desc">Infinity · Unlimited Void · Domain Expansion with deep blue glow effects</div>
+          <div class="card-tags">
+            <span class="ctag ct-purple">Glow</span>
+            <span class="ctag ct-red">Particles</span>
+            <span class="ctag ct-white">Freeze Frame</span>
+          </div>
+        </div>
+      </div>
+      <div class="showcase-card">
+        <div class="card-vis bg-shisui">👁️🔴⚡</div>
+        <div class="card-info">
+          <div class="card-name">Shisui Uchiha Edits</div>
+          <div class="card-desc">Sharingan · Flash Step · Kotoamatsukami with red lightning energy</div>
+          <div class="card-tags">
+            <span class="ctag ct-red">Lightning</span>
+            <span class="ctag ct-white">Speed FX</span>
+            <span class="ctag ct-purple">Aura</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: INTERACT -->
+<section class="section" id="interact">
+  <div class="max-w">
+    <span class="sec-tag">Phase 03 · Live Polls</span>
+    <div class="sec-title">Audience <span>Interaction</span></div>
+    <div class="sec-line"></div>
+    <div class="polls-grid">
+      <div class="poll-card" id="poll1">
+        <div class="poll-hdr">🔥 Live Poll · Vote Now</div>
+        <div class="poll-q">Who's the GOAT — Naruto or Sasuke?</div>
+        <div class="poll-opts">
+          <div class="poll-opt" onclick="vote('poll1',0,this)">
+            <div class="pf pf-red" id="poll1-f0" style="width:55%"></div>
+            <div class="pc"><div class="pc-label"><span class="pc-emoji">🧡</span> Naruto Uzumaki</div><div class="pc-pct" id="poll1-p0">55%</div></div>
+          </div>
+          <div class="poll-opt" onclick="vote('poll1',1,this)">
+            <div class="pf pf-purple" id="poll1-f1" style="width:45%"></div>
+            <div class="pc"><div class="pc-label"><span class="pc-emoji">💙</span> Sasuke Uchiha</div><div class="pc-pct" id="poll1-p1">45%</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="poll-card" id="poll2">
+        <div class="poll-hdr">💜 Live Poll · Choose Your Side</div>
+        <div class="poll-q">Gojo vs Sukuna — Who wins the rematch?</div>
+        <div class="poll-opts">
+          <div class="poll-opt" onclick="vote('poll2',0,this)">
+            <div class="pf pf-purple" id="poll2-f0" style="width:62%"></div>
+            <div class="pc"><div class="pc-label"><span class="pc-emoji">💜</span> Satoru Gojo</div><div class="pc-pct" id="poll2-p0">62%</div></div>
+          </div>
+          <div class="poll-opt" onclick="vote('poll2',1,this)">
+            <div class="pf pf-red" id="poll2-f1" style="width:38%"></div>
+            <div class="pc"><div class="pc-label"><span class="pc-emoji">❤️</span> Ryomen Sukuna</div><div class="pc-pct" id="poll2-p1">38%</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="poll-card" id="poll3">
+        <div class="poll-hdr">⚡ Live Poll · Big Question</div>
+        <div class="poll-q">Best anime transformation scene ever?</div>
+        <div class="poll-opts">
+          <div class="poll-opt" onclick="vote('poll3',0,this)">
+            <div class="pf pf-red" id="poll3-f0" style="width:42%"></div>
+            <div class="pc"><div class="pc-label"><span class="pc-emoji">🍃</span> Naruto Baryon Mode</div><div class="pc-pct" id="poll3-p0">42%</div></div>
+          </div>
+          <div class="poll-opt" onclick="vote('poll3',1,this)">
+            <div class="pf pf-purple" id="poll3-f1" style="width:58%"></div>
+            <div class="pc"><div class="pc-label"><span class="pc-emoji">⚫</span> Asta Devil Union</div><div class="pc-pct" id="poll3-p1">58%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="engage-grid">
+      <div class="engage-btn" onclick="pulse(this)"><span class="eb-icon">💬</span><div class="eb-label">Comment</div></div>
+      <div class="engage-btn" onclick="pulse(this)"><span class="eb-icon">🔗</span><div class="eb-label">Share Event</div></div>
+      <div class="engage-btn" onclick="pulse(this)"><span class="eb-icon">👥</span><div class="eb-label">Invite Friends</div></div>
+      <div class="engage-btn" onclick="pulse(this)"><span class="eb-icon">📲</span><div class="eb-label">Join Telegram</div></div>
+      <div class="engage-btn" onclick="pulse(this)"><span class="eb-icon">🔔</span><div class="eb-label">Notify Me</div></div>
+      <div class="engage-btn" onclick="pulse(this)"><span class="eb-icon">🎉</span><div class="eb-label">React Live</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: GROWTH -->
+<section class="section" id="growth">
+  <div class="max-w">
+    <span class="sec-tag">Phase 04 · Creator Tips</span>
+    <div class="sec-title">Creator <span>Growth</span> Zone</div>
+    <div class="sec-line"></div>
+    <div class="growth-list">
+      <div class="growth-item">
+        <div class="gi-num">01</div>
+        <div class="gi-body">
+          <h4>Hook in 0–3 Seconds</h4>
+          <p>Start with the most intense frame of your edit. Never start cold — hit them with the best part FIRST. The algorithm rewards instant engagement.</p>
+        </div>
+      </div>
+      <div class="growth-item">
+        <div class="gi-num">02</div>
+        <div class="gi-body">
+          <h4>Beat Sync is Everything</h4>
+          <p>Time every cut, flash, and shake to the beat drop. Sync = retention. Retention = reach. CapCut's beat sync tool makes this effortless.</p>
+        </div>
+      </div>
+      <div class="growth-item">
+        <div class="gi-num">03</div>
+        <div class="gi-body">
+          <h4>Use Trending Audio Early</h4>
+          <p>Jump on viral sounds within 24–48 hours of trending. CapCut's trending library and TikTok sounds are your cheat code for algorithmic reach.</p>
+        </div>
+      </div>
+      <div class="growth-item">
+        <div class="gi-num">04</div>
+        <div class="gi-body">
+          <h4>Reel Length: 7–15 Seconds</h4>
+          <p>Short, punchy, and re-watchable. The algorithm rewards replays — edits that feel too short get rewatched. Keep them wanting MORE.</p>
+        </div>
+      </div>
+      <div class="growth-item">
+        <div class="gi-num">05</div>
+        <div class="gi-body">
+          <h4>Faceless = More Scalable</h4>
+          <p>Anime visuals + text overlays + AI voice means you can post daily with zero burnout. Build a system, not just a channel. Automate your growth.</p>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:24px;margin-bottom:10px">
+      <div style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:4px;color:rgba(255,255,255,0.3);text-transform:uppercase;">Recommended Editing Apps</div>
+    </div>
+    <div class="apps-row">
+      <div class="app-pill"><span class="ap-dot" style="background:#00d4ff"></span> CapCut</div>
+      <div class="app-pill"><span class="ap-dot" style="background:#ff6b00"></span> Alight Motion</div>
+      <div class="app-pill"><span class="ap-dot" style="background:#ff1744"></span> VN Editor</div>
+      <div class="app-pill"><span class="ap-dot" style="background:#9c27b0"></span> InShot</div>
+      <div class="app-pill"><span class="ap-dot" style="background:#00e676"></span> Splice</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5: CONTEST -->
+<section class="section" id="contest">
+  <div class="max-w">
+    <span class="sec-tag">Phase 05 · Competition</span>
+    <div class="sec-title">Edit <span>Contest</span> 2026</div>
+    <div class="sec-line"></div>
+    <div class="contest-cats">
+      <div class="contest-cat">
+        <div class="cc-left"><span class="cc-icon">🍃</span><div><div class="cc-name">Best Naruto Edit</div><div class="cc-sub">Any arc · Any transformation</div></div></div>
+        <div class="cc-badge">OPEN</div>
+      </div>
+      <div class="contest-cat">
+        <div class="cc-left"><span class="cc-icon">⚫</span><div><div class="cc-name">Best Asta Edit</div><div class="cc-sub">Devil Union · Anti-Magic power</div></div></div>
+        <div class="cc-badge">OPEN</div>
+      </div>
+      <div class="contest-cat">
+        <div class="cc-left"><span class="cc-icon">♾️</span><div><div class="cc-name">Best Gojo Edit</div><div class="cc-sub">Infinity · Domain Expansion</div></div></div>
+        <div class="cc-badge">OPEN</div>
+      </div>
+      <div class="contest-cat">
+        <div class="cc-left"><span class="cc-icon">💔</span><div><div class="cc-name">Most Emotional Edit</div><div class="cc-sub">Make the entire community feel it</div></div></div>
+        <div class="cc-badge">OPEN</div>
+      </div>
+      <div class="contest-cat">
+        <div class="cc-left"><span class="cc-icon">⚡</span><div><div class="cc-name">Best Transition Edit</div><div class="cc-sub">Smoothest cuts · Most creative flow</div></div></div>
+        <div class="cc-badge">OPEN</div>
+      </div>
+    </div>
+    <button class="submit-btn" onclick="this.textContent='🔥 SUBMISSION NOTED — SEE YOU LIVE!'">
+      🔥 Submit Your Edit Now
+    </button>
+  </div>
+</section>
+
+<!-- SECTION 6: FINALE -->
+<section class="section" id="finale">
+  <div class="max-w">
+    <span class="sec-tag">Phase 06 · Closing</span>
+    <div class="sec-title">Until Next <span>Time</span></div>
+    <div class="sec-line"></div>
+    <div class="finale-hero">
+      <div class="finale-words">CREATE<br>INSPIRE<br>GROW<br>TOGETHER 🔥</div>
+    </div>
+    <div class="promo-links">
+      <a class="promo-link" href="#">
+        <div class="pl-icon pi-fb">📘</div>
+        <div class="pl-text"><h4>Follow on Facebook</h4><p>Get notified for every live event, drop, and announcement</p></div>
+        <div class="pl-arrow">›</div>
+      </a>
+      <a class="promo-link" href="#">
+        <div class="pl-icon pi-tg">✈️</div>
+        <div class="pl-text"><h4>Join Telegram Community</h4><p>Anime creators hub · Daily edits · Exclusive tips</p></div>
+        <div class="pl-arrow">›</div>
+      </a>
+      <a class="promo-link" href="#">
+        <div class="pl-icon pi-next">🔥</div>
+        <div class="pl-text"><h4>Next Event Coming Soon</h4><p>Stay tuned for the next anime creator festival</p></div>
+        <div class="pl-arrow">›</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">🔥 Anime Viral Reels & Edit Contest 2026 🔥</div>
+  <div class="footer-sub">Virtual Facebook Live · All Anime Creators Welcome · CREATE · INSPIRE · GROW · TOGETHER</div>
+</footer>
+
+<div class="energy-bar"></div>
+
+<script>
+  // Countdown
+  const target = new Date(Date.now() + (7*86400 + 14*3600 + 32*60)*1000);
+  function updateCd() {
+    const d = target - Date.now();
+    if(d <= 0) return;
+    document.getElementById('cd-days').textContent = String(Math.floor(d/86400000)).padStart(2,'0');
+    document.getElementById('cd-hours').textContent = String(Math.floor((d%86400000)/3600000)).padStart(2,'0');
+    document.getElementById('cd-mins').textContent = String(Math.floor((d%3600000)/60000)).padStart(2,'0');
+    document.getElementById('cd-secs').textContent = String(Math.floor((d%60000)/1000)).padStart(2,'0');
+  }
+  updateCd(); setInterval(updateCd, 1000);
+
+  // Nav active
+  function setActive(el) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Polls
+  const pollVotes = {};
+  function vote(id, idx, el) {
+    if(pollVotes[id] !== undefined) return;
+    pollVotes[id] = idx;
+    const base = idx===0 ? 0.55 : 0.45;
+    const pct = Math.round((base + (Math.random()*0.1-0.05))*100);
+    const other = 100-pct;
+    document.getElementById(id+'-f'+idx).style.width = pct+'%';
+    document.getElementById(id+'-p'+idx).textContent = pct+'%';
+    document.getElementById(id+'-f'+(1-idx)).style.width = other+'%';
+    document.getElementById(id+'-p'+(1-idx)).textContent = other+'%';
+    el.classList.add('voted');
+  }
+
+  // Engage pulse
+  function pulse(el) {
+    el.style.borderColor = 'rgba(255,23,68,0.9)';
+    el.style.background = 'rgba(255,23,68,0.15)';
+    setTimeout(()=>{ el.style.borderColor=''; el.style.background=''; }, 600);
+  }
+
+  // Particles
+  const colors = ['#ff1744','#9c27b0','#ff4081','#ce93d8','#ff6d00','#ffffff'];
+  const pc = document.getElementById('particles');
+  for(let i=0;i<24;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 2+Math.random()*3;
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      top:${40+Math.random()*60}%;
+      width:${size}px; height:${size}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      --dx:${(Math.random()-0.5)*80}px;
+      animation-duration:${2+Math.random()*3}s;
+      animation-delay:${Math.random()*4}s;
+      box-shadow:0 0 5px currentColor;
+      opacity:0.7;
+    `;
+    pc.appendChild(p);
+  }
+
+  // Scroll-based nav highlight
+  const sections = ['intro','showcase','interact','growth','contest','finale'];
+  const navBtns = document.querySelectorAll('.nav-btn');
+  window.addEventListener('scroll', () => {
+    let current = 0;
+    sections.forEach((id,i) => {
+      const el = document.getElementById(id);
+      if(el && window.scrollY >= el.offsetTop - 120) current = i;
+    });
+    navBtns.forEach((b,i) => b.classList.toggle('active', i===current));
+  });
+</script>
+</body>
+</html>
