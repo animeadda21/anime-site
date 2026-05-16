@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arrow Puzzle – Escape Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0D1117;
+    --surface:   #161B22;
+    --surface2:  #21262D;
+    --border:    #30363D;
+    --blue:      #58A6FF;
+    --green:     #3FB950;
+    --red:       #F85149;
+    --yellow:    #D29922;
+    --purple:    #BC8CFF;
+    --text:      #E6EDF3;
+    --muted:     #8B949E;
+    --cell-empty:   #1C2128;
+    --cell-wall:    #0D1117;
+    --cell-fixed:   #1F3A5F;
+    --cell-place:   #2D2A1F;
+    --cell-start:   #1A3A2A;
+    --cell-exit:    #3A1A2A;
+    --cell-visited: #0D2137;
+    --cell-player:  #58A6FF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; width: 100%; max-width: 520px; padding: 20px; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; }
+
+  /* ── Home Screen ── */
+  .logo-arrows {
+    font-family: 'Space Mono', monospace;
+    font-size: 2.2rem;
+    color: var(--blue);
+    letter-spacing: 8px;
+    animation: pulse 1.8s ease-in-out infinite alternate;
+  }
+  @keyframes pulse { from { opacity: 0.7; transform: scale(1); } to { opacity: 1; transform: scale(1.05); } }
+  .logo-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 8px 0 2px;
+    color: var(--text);
+  }
+  .logo-sub { color: var(--purple); font-size: 1rem; font-weight: 500; margin-bottom: 12px; }
+  .tagline { color: var(--muted); font-size: 0.9rem; text-align: center; line-height: 1.7; margin-bottom: 28px; }
+
+  /* ── Buttons ── */
+  .btn {
+    width: 100%; padding: 14px; border: none; border-radius: 12px;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: transform 0.1s, opacity 0.1s; margin-bottom: 10px;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-green  { background: var(--green);  color: #0D1117; }
+  .btn-blue   { background: transparent; color: var(--blue); border: 1.5px solid var(--blue); }
+  .btn-red    { background: var(--red);    color: #0D1117; }
+  .btn-yellow { background: var(--yellow); color: #0D1117; }
+  .btn-ghost  { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ── Level Select ── */
+  .screen-header {
+    display: flex; align-items: center; width: 100%;
+    margin-bottom: 20px; gap: 12px;
+  }
+  .back-btn {
+    background: none; border: none; color: var(--text);
+    font-size: 1.4rem; cursor: pointer; padding: 4px 8px;
+    border-radius: 8px; transition: background 0.15s;
+  }
+  .back-btn:hover { background: var(--surface2); }
+  .screen-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem; font-weight: 700;
+  }
+  .levels-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; width: 100%;
+  }
+  .level-card {
+    aspect-ratio: 1; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 14px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer; transition: border-color 0.15s, transform 0.1s;
+    gap: 4px;
+  }
+  .level-card:hover:not(.locked) { border-color: var(--blue); transform: scale(1.03); }
+  .level-card:active:not(.locked) { transform: scale(0.97); }
+  .level-card.locked { opacity: 0.4; cursor: not-allowed; }
+  .level-card.completed { border-color: var(--green); }
+  .level-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.8rem; font-weight: 700; color: var(--blue);
+  }
+  .level-card.locked .level-num { color: var(--muted); }
+  .level-size { font-size: 0.7rem; color: var(--muted); }
+  .level-stars { font-size: 0.75rem; letter-spacing: 2px; }
+
+  /* ── Game Screen ── */
+  #game-screen { padding: 12px; max-width: 560px; }
+  .game-header {
+    display: flex; align-items: center;
+    width: 100%; margin-bottom: 10px; gap: 8px;
+  }
+  .game-info { flex: 1; }
+  .game-level-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem; font-weight: 700; color: var(--text);
+  }
+  .game-stats {
+    font-size: 0.72rem; color: var(--muted); margin-top: 2px;
+    font-family: 'Space Mono', monospace;
+  }
+  .banner {
+    width: 100%; padding: 10px 14px; border-radius: 10px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  .banner.error  { background: rgba(248,81,73,0.15); color: var(--red); }
+  .banner.hint   { background: rgba(188,140,255,0.15); color: var(--purple); }
+  .banner .dismiss { margin-left: auto; cursor: pointer; opacity: 0.7; font-size: 1rem; }
+
+  /* ── Grid ── */
+  #grid-container { display: flex; justify-content: center; margin: 8px 0; width: 100%; }
+  .grid { display: grid; gap: 3px; }
+  .cell {
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 7px; cursor: default;
+    font-size: 1.4rem; font-weight: 700;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
+    border: 1px solid transparent; user-select: none;
+    font-family: 'Space Mono', monospace;
+    position: relative; overflow: hidden;
+  }
+  .cell.empty     { background: var(--cell-empty); }
+  .cell.wall      { background: var(--cell-wall); border-color: #1a1f27; }
+  .cell.start     { background: var(--cell-start); }
+  .cell.exit      { background: var(--cell-exit); }
+  .cell.arrow-fixed { background: var(--cell-fixed); color: var(--blue); border-color: rgba(88,166,255,0.2); }
+  .cell.arrow-place { background: var(--cell-place); color: var(--yellow); border-color: rgba(210,153,34,0.2); cursor: pointer; }
+  .cell.arrow-place:hover { border-color: var(--yellow); transform: scale(1.05); }
+  .cell.arrow-place:active { transform: scale(0.95); }
+  .cell.visited   { background: var(--cell-visited); }
+  .cell.player    { background: var(--cell-player) !important; transform: scale(1.1); box-shadow: 0 0 12px rgba(88,166,255,0.5); z-index: 2; border-color: var(--blue) !important; }
+  .cell.hinted    { border-color: var(--yellow) !important; box-shadow: 0 0 8px rgba(210,153,34,0.4); }
+  .cell.arrow-place.none-dir::after {
+    content: '+'; color: rgba(210,153,34,0.25); font-size: 1rem; position: absolute;
+  }
+
+  /* ── Controls ── */
+  .controls {
+    display: flex; align-items: center; justify-content: space-around;
+    width: 100%; padding: 8px 0; margin-top: 4px;
+  }
+  .ctrl-btn {
+    display: flex; flex-direction: column; align-items: center;
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); gap: 3px; padding: 6px 10px;
+    border-radius: 10px; transition: background 0.15s, color 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .ctrl-btn:hover:not(:disabled) { background: var(--surface2); }
+  .ctrl-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .ctrl-btn .icon { font-size: 1.5rem; }
+  .ctrl-btn .label { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.5px; }
+  .ctrl-btn.undo-btn  { color: var(--yellow); }
+  .ctrl-btn.hint-btn  { color: var(--purple); }
+  .main-btn {
+    padding: 10px 28px; border-radius: 12px; border: none;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; transition: transform 0.1s, opacity 0.1s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .main-btn:active { transform: scale(0.96); }
+  .main-btn.start  { background: var(--green);  color: #0D1117; }
+  .main-btn.pause  { background: var(--yellow); color: #0D1117; }
+  .main-btn.resume { background: var(--blue);   color: #0D1117; }
+  .main-btn.retry  { background: var(--red);    color: #0D1117; }
+
+  /* ── Pause Overlay ── */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(13,17,23,0.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; backdrop-filter: blur(4px);
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 32px; width: 300px;
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+  }
+  .overlay-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.4rem; font-weight: 700; margin-bottom: 8px;
+  }
+
+  /* ── Win Screen ── */
+  #win-screen { max-width: 380px; }
+  .trophy { font-size: 5rem; animation: bounce 0.6s ease; }
+  @keyframes bounce {
+    0%   { transform: scale(0) rotate(-10deg); }
+    60%  { transform: scale(1.15) rotate(3deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+  .win-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.6rem; font-weight: 700; color: var(--green);
+    margin: 8px 0 4px;
+  }
+  .win-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 12px; }
+  .stars-row { font-size: 2.2rem; letter-spacing: 6px; margin: 4px 0; }
+  .score-box {
+    background: var(--surface2); border-radius: 14px;
+    padding: 16px 40px; text-align: center; margin: 8px 0 20px;
+  }
+  .score-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 2.4rem; font-weight: 700; color: var(--purple);
+  }
+  .score-label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .win-btns { display: flex; gap: 10px; width: 100%; }
+  .win-btns .btn { margin-bottom: 0; }
+
+  /* ── Responsive ── */
+  @media (max-width: 400px) {
+    .logo-title { font-size: 1.4rem; }
+    .logo-arrows { font-size: 1.7rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     HOME SCREEN
+═══════════════════════════════════════════════════════ -->
+<div id="home-screen" class="screen active">
+  <div style="height:40px"></div>
+  <div class="logo-arrows">→ ↓ ← ↑</div>
+  <div class="logo-title">Arrow Puzzle</div>
+  <div class="logo-sub">Escape Game</div>
+  <p class="tagline">Place arrows. Navigate the grid.<br>Find the exit before you loop forever.</p>
+  <button class="btn btn-green" onclick="showScreen('level-select-screen')">▶&nbsp; Play</button>
+  <button class="btn btn-blue"  onclick="showScreen('level-select-screen')">☰&nbsp; Level Select</button>
+  <p style="color:var(--muted);font-size:0.78rem;margin-top:20px">10 hand-crafted levels · No ads · Free</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     LEVEL SELECT SCREEN
+═══════════════════════════════════════════════════════ -->
+<div id="level-select-screen" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home-screen')">←</button>
+    <span class="screen-title">Select Level</span>
+  </div>
+  <div class="levels-grid" id="levels-grid"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     GAME SCREEN
+═══════════════════════════════════════════════════════ -->
+<div id="game-screen" class="screen">
+  <div class="game-header">
+    <button class="back-btn" onclick="goToLevelSelect()">←</button>
+    <div class="game-info">
+      <div class="game-level-name" id="game-level-name">Level 1</div>
+      <div class="game-stats" id="game-stats">Moves: 0 · Time: 0s · Hints: 0</div>
+    </div>
+    <button class="ctrl-btn" onclick="togglePause()" id="pause-header-btn" style="color:var(--yellow)">
+      <span class="icon">⏸</span>
+    </button>
+  </div>
+
+  <div id="status-banner" class="banner error" style="display:none"></div>
+  <div id="hint-banner"   class="banner hint"  style="display:none"></div>
+
+  <div id="grid-container">
+    <div class="grid" id="game-grid"></div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn undo-btn" id="undo-btn" onclick="doUndo()" disabled>
+      <span class="icon">↩</span><span class="label">Undo</span>
+    </button>
+    <button class="main-btn start" id="main-btn" onclick="onMainBtn()">▶ Start</button>
+    <button class="ctrl-btn hint-btn" id="hint-btn" onclick="doHint()">
+      <span class="icon">💡</span><span class="label">Hint</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     WIN SCREEN
+═══════════════════════════════════════════════════════ -->
+<div id="win-screen" class="screen">
+  <div class="trophy">🏆</div>
+  <div class="win-title">Level Complete!</div>
+  <div class="win-sub" id="win-sub">Level 1 cleared</div>
+  <div class="stars-row" id="win-stars">★★★</div>
+  <div class="score-box">
+    <div class="score-num" id="win-score">1000</div>
+    <div class="score-label">points</div>
+  </div>
+  <button class="btn btn-green" id="next-btn" onclick="goNextLevel()">Next Level →</button>
+  <div class="win-btns">
+    <button class="btn btn-blue"  onclick="replayLevel()">↺ Replay</button>
+    <button class="btn btn-ghost" onclick="showScreen('level-select-screen')">☰ Menu</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAUSE OVERLAY
+═══════════════════════════════════════════════════════ -->
+<div id="pause-overlay" class="overlay hidden">
+  <div class="overlay-card">
+    <div class="overlay-title">⏸ Paused</div>
+    <button class="btn btn-green"  onclick="togglePause()">▶ Resume</button>
+    <button class="btn btn-yellow" onclick="doRestart()">↺ Restart Level</button>
+    <button class="btn btn-blue"   onclick="goToLevelSelect()">☰ Level Select</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// LEVEL DATA
+// ═══════════════════════════════════════════════════════════
+const LEVELS = [
+  {
+    id:1, name:"Level 1 – First Step", rows:5, cols:5, par:3,
+    hint:"Follow the fixed arrows straight to the exit.",
+    grid:[
+      "W","W","W","W","W",
+      "W","S","F>","F>","W",
+      "W","W","W","X","W",
+      "W","E","E","E","W",
+      "W","W","W","W","W"
+    ]
+  },
+  {
+    id:2, name:"Level 2 – Turn Around", rows:5, cols:5, par:4,
+    hint:"You need to turn the player downward at the corner.",
+    grid:[
+      "W","W","W","W","W",
+      "W","S","F>","P","W",
+      "W","W","W","Fv","W",
+      "W","E","E","X","W",
+      "W","W","W","W","W"
+    ]
+  },
+  {
+    id:3, name:"Level 3 – Detour", rows:6, cols:6, par:6,
+    hint:"Place an arrow to redirect around the wall block.",
+    grid:[
+      "W","W","W","W","W","W",
+      "W","S","E","W","E","W",
+      "W","F>","P","W","E","W",
+      "W","E","E","E","P","W",
+      "W","E","W","W","X","W",
+      "W","W","W","W","W","W"
+    ]
+  },
+  {
+    id:4, name:"Level 4 – The Fork", rows:6, cols:6, par:7,
+    hint:"Not every path leads to exit. Choose the correct arrow direction.",
+    grid:[
+      "W","W","W","W","W","W",
+      "W","S","F>","P","E","W",
+      "W","W","W","Fv","W","W",
+      "W","X","W","P","W","W",
+      "W","W","W","F<","W","W",
+      "W","W","W","W","W","W"
+    ]
+  },
+  {
+    id:5, name:"Level 5 – Maze Runner", rows:6, cols:6, par:8,
+    hint:"Work backwards from the exit to plan your arrow path.",
+    grid:[
+      "W","W","W","W","W","W",
+      "W","S","P","W","E","W",
+      "W","Fv","W","E","P","W",
+      "W","P","E","E","F^","W",
+      "W","W","F>","P","X","W",
+      "W","W","W","W","W","W"
+    ]
+  },
+  {
+    id:6, name:"Level 6 – Cross Roads", rows:7, cols:7, par:9,
+    hint:"The center column is the key. Route through it carefully.",
+    grid:[
+      "W","W","W","W","W","W","W",
+      "W","S","E","P","E","E","W",
+      "W","W","W","Fv","W","W","W",
+      "W","E","E","P","E","X","W",
+      "W","W","W","F^","W","W","W",
+      "W","E","E","P","E","E","W",
+      "W","W","W","W","W","W","W"
+    ]
+  },
+  {
+    id:7, name:"Level 7 – Spiral", rows:7, cols:7, par:11,
+    hint:"Think in loops — but avoid getting stuck in one forever.",
+    grid:[
+      "W","W","W","W","W","W","W",
+      "W","S","F>","P","P","Fv","W",
+      "W","F^","W","W","W","P","W",
+      "W","P","W","X","W","Fv","W",
+      "W","Fv","W","W","W","P","W",
+      "W","F>","P","P","P","F^","W",
+      "W","W","W","W","W","W","W"
+    ]
+  },
+  {
+    id:8, name:"Level 8 – Dead Ends", rows:7, cols:7, par:12,
+    hint:"Several paths are traps. Think before placing arrows.",
+    grid:[
+      "W","W","W","W","W","W","W",
+      "W","S","P","E","P","E","W",
+      "W","Fv","W","W","Fv","W","W",
+      "W","P","E","E","P","E","W",
+      "W","F>","W","W","W","X","W",
+      "W","E","P","E","P","E","W",
+      "W","W","W","W","W","W","W"
+    ]
+  },
+  {
+    id:9, name:"Level 9 – The Gauntlet", rows:8, cols:8, par:14,
+    hint:"Patience. Every single arrow placement matters here.",
+    grid:[
+      "W","W","W","W","W","W","W","W",
+      "W","S","P","E","W","E","E","W",
+      "W","Fv","W","P","E","W","P","W",
+      "W","P","E","W","F>","P","E","W",
+      "W","F>","E","P","W","W","F^","W",
+      "W","W","W","Fv","E","E","E","W",
+      "W","E","P","P","F>","E","X","W",
+      "W","W","W","W","W","W","W","W"
+    ]
+  },
+  {
+    id:10, name:"Level 10 – Master Escape", rows:8, cols:8, par:16,
+    hint:"The final challenge. No wasted moves. Every cell counts.",
+    grid:[
+      "W","W","W","W","W","W","W","W",
+      "W","S","P","P","W","E","E","W",
+      "W","Fv","W","Fv","E","W","P","W",
+      "W","P","E","P","F<","E","F^","W",
+      "W","F>","P","W","W","P","W","W",
+      "W","W","Fv","E","P","F>","P","W",
+      "W","P","P","F>","E","W","X","W",
+      "W","W","W","W","W","W","W","W"
+    ]
+  }
+];
+
+// Parse grid token → cell object
+function parseCell(token) {
+  if (token === "W")  return { type:"wall",        dir:"none" };
+  if (token === "E")  return { type:"empty",       dir:"none" };
+  if (token === "S")  return { type:"start",       dir:"none" };
+  if (token === "X")  return { type:"exit",        dir:"none" };
+  if (token === "P")  return { type:"arrow-place", dir:"none" };
+  if (token === "F>") return { type:"arrow-fixed", dir:"right" };
+  if (token === "F<") return { type:"arrow-fixed", dir:"left"  };
+  if (token === "F^") return { type:"arrow-fixed", dir:"up"    };
+  if (token === "Fv") return { type:"arrow-fixed", dir:"down"  };
+  return { type:"empty", dir:"none" };
+}
+
+const DIR_CYCLE = ["none","right","up","left","down"];
+const DIR_SYMBOL = { none:"", right:"→", up:"↑", left:"←", down:"↓" };
+const DIR_DELTA  = {
+  right: [0,1], left:[0,-1], up:[-1,0], down:[1,0], none:[0,0]
+};
+
+const MAX_STEPS = 500;
+const TICK_MS   = 380;
+const SCORE_BASE = 1000;
+
+// ═══════════════════════════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════════════════════════
+let state = {
+  levelIdx: 0,
+  grid: [],          // 2D array of { type, dir, visited }
+  rows: 0, cols: 0,
+  playerR: 0, playerC: 0,
+  startR: 0, startC: 0,
+  status: "idle",    // idle | running | paused | won | lost
+  moves: 0,
+  secs: 0,
+  hintsUsed: 0,
+  history: [],       // stack of grid snapshots
+};
+
+let tickTimer  = null;
+let clockTimer = null;
+let unlockedLevels = new Set([1]);
+let completedScores = {};  // levelId → score
+
+// ═══════════════════════════════════════════════════════════
+// SCREEN NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'level-select-screen') renderLevelSelect();
+}
+
+function goToLevelSelect() {
+  stopLoops();
+  hidePause();
+  showScreen('level-select-screen');
+}
+
+// ═══════════════════════════════════════════════════════════
+// LEVEL SELECT
+// ═══════════════════════════════════════════════════════════
+function renderLevelSelect() {
+  const grid = document.getElementById('levels-grid');
+  grid.innerHTML = '';
+  LEVELS.forEach(lvl => {
+    const unlocked  = unlockedLevels.has(lvl.id);
+    const completed = completedScores[lvl.id] != null;
+    const score     = completedScores[lvl.id] || 0;
+    const stars     = completed ? (score >= 900 ? 3 : score >= 600 ? 2 : 1) : 0;
+    const starStr   = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+
+    const card = document.createElement('div');
+    card.className = 'level-card' +
+      (!unlocked ? ' locked' : '') +
+      (completed ? ' completed' : '');
+
+    card.innerHTML = `
+      <div class="level-num">${unlocked ? lvl.id : '🔒'}</div>
+      <div class="level-size">${lvl.rows}×${lvl.cols}</div>
+      ${completed ? `<div class="level-stars" style="color:var(--yellow)">${starStr}</div>` : ''}
+    `;
+    if (unlocked) card.onclick = () => loadLevel(lvl.id);
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// LOAD LEVEL
+// ═══════════════════════════════════════════════════════════
+function loadLevel(levelId) {
+  stopLoops();
+  hidePause();
+  hideBanners();
+
+  const lvl = LEVELS.find(l => l.id === levelId);
+  state.levelIdx = LEVELS.indexOf(lvl);
+
+  // Build grid
+  state.rows = lvl.rows;
+  state.cols = lvl.cols;
+  state.grid = [];
+  for (let r = 0; r < lvl.rows; r++) {
+    state.grid[r] = [];
+    for (let c = 0; c < lvl.cols; c++) {
+      const token = lvl.grid[r * lvl.cols + c];
+      const cell  = parseCell(token);
+      state.grid[r][c] = { ...cell, visited: false };
+      if (cell.type === 'start') { state.startR = r; state.startC = c; }
+    }
+  }
+
+  state.playerR   = state.startR;
+  state.playerC   = state.startC;
+  state.status    = 'idle';
+  state.moves     = 0;
+  state.secs      = 0;
+  state.hintsUsed = 0;
+  state.history   = [];
+
+  renderGrid();
+  updateHUD();
+  setMainBtn('start');
+  document.getElementById('undo-btn').disabled = true;
+  document.getElementById('hint-btn').disabled = false;
+  document.getElementById('pause-header-btn').style.display = '';
+
+  showScreen('game-screen');
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER GRID
+// ═══════════════════════════════════════════════════════════
+function renderGrid() {
+  const lvl       = LEVELS[state.levelIdx];
+  const container = document.getElementById('grid-container');
+  const vw        = Math.min(window.innerWidth, 540) - 32;
+  const cellSize  = Math.max(36, Math.min(64, Math.floor((vw - (lvl.cols - 1) * 3) / lvl.cols)));
+
+  const gridEl = document.getElementById('game-grid');
+  gridEl.style.gridTemplateColumns = `repeat(${lvl.cols}, ${cellSize}px)`;
+  gridEl.innerHTML = '';
+
+  for (let r = 0; r < state.rows; r++) {
+    for (let c = 0; c < state.cols; c++) {
+      const cell    = state.grid[r][c];
+      const isPlayer = r === state.playerR && c === state.playerC;
+      const el      = document.createElement('div');
+
+      el.className = 'cell';
+      el.style.width  = cellSize + 'px';
+      el.style.height = cellSize + 'px';
+      el.style.fontSize = Math.max(14, cellSize * 0.44) + 'px';
+      el.dataset.r = r;
+      el.dataset.c = c;
+
+      if (isPlayer) {
+        el.classList.add('player');
+        el.textContent = '●';
+      } else if (cell.type === 'wall') {
+        el.classList.add('wall');
+      } else if (cell.type === 'start') {
+        el.classList.add('start');
+        el.textContent = cell.visited ? '' : '★';
+        el.style.color = 'var(--green)';
+      } else if (cell.type === 'exit') {
+        el.classList.add('exit');
+        el.textContent = '🚪';
+        el.style.fontSize = Math.max(12, cellSize * 0.38) + 'px';
+      } else if (cell.type === 'arrow-fixed') {
+        el.classList.add(cell.visited ? 'visited' : 'arrow-fixed');
+        el.textContent = DIR_SYMBOL[cell.dir] || '';
+      } else if (cell.type === 'arrow-place') {
+        el.classList.add(cell.visited ? 'visited' : 'arrow-place');
+        el.textContent = DIR_SYMBOL[cell.dir] || '';
+        if (!cell.dir || cell.dir === 'none') el.classList.add('none-dir');
+        if (state.status === 'idle') {
+          el.onclick = () => cycleCell(r, c);
+        }
+      } else if (cell.type === 'empty') {
+        el.classList.add(cell.visited ? 'visited' : 'empty');
+      }
+
+      gridEl.appendChild(el);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// CYCLE ARROW (tap to place)
+// ═══════════════════════════════════════════════════════════
+function cycleCell(r, c) {
+  if (state.status !== 'idle') return;
+  const cell = state.grid[r][c];
+  if (cell.type !== 'arrow-place') return;
+
+  // Save to history
+  state.history.push(deepCloneGrid());
+
+  const idx = DIR_CYCLE.indexOf(cell.dir);
+  cell.dir  = DIR_CYCLE[(idx + 1) % DIR_CYCLE.length];
+
+  hideBanners();
+  renderGrid();
+  document.getElementById('undo-btn').disabled = state.history.length === 0;
+}
+
+// ═══════════════════════════════════════════════════════════
+// START / PAUSE / RESTART
+// ═══════════════════════════════════════════════════════════
+function onMainBtn() {
+  if (state.status === 'idle')    startSim();
+  else if (state.status === 'lost') doRestart();
+}
+
+function startSim() {
+  // Clear visited flags
+  for (let r = 0; r < state.rows; r++)
+    for (let c = 0; c < state.cols; c++)
+      state.grid[r][c].visited = false;
+
+  state.status = 'running';
+  hideBanners();
+  setMainBtn('pause');
+  document.getElementById('undo-btn').disabled  = true;
+  document.getElementById('hint-btn').disabled  = true;
+  document.getElementById('pause-header-btn').style.display = '';
+
+  startTickLoop();
+  startClock();
+}
+
+function togglePause() {
+  if (state.status === 'running') {
+    state.status = 'paused';
+    stopLoops();
+    document.getElementById('pause-overlay').classList.remove('hidden');
+  } else if (state.status === 'paused') {
+    hidePause();
+    state.status = 'running';
+    startTickLoop();
+    startClock();
+  }
+}
+
+function hidePause() {
+  document.getElementById('pause-overlay').classList.add('hidden');
+}
+
+function doRestart() {
+  hidePause();
+  loadLevel(LEVELS[state.levelIdx].id);
+}
+
+function doUndo() {
+  if (state.history.length === 0) return;
+  state.grid = state.history.pop();
+  hideBanners();
+  renderGrid();
+  document.getElementById('undo-btn').disabled = state.history.length === 0;
+}
+
+// ═══════════════════════════════════════════════════════════
+// TICK LOOP — move player one step
+// ═══════════════════════════════════════════════════════════
+function startTickLoop() {
+  stopTick();
+  tickTimer = setInterval(tick, TICK_MS);
+}
+
+function stopTick() {
+  if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+}
+
+function tick() {
+  const cell = state.grid[state.playerR][state.playerC];
+  const dir  = cell.type === 'start' || cell.type === 'empty' || cell.type === 'arrow-place' || cell.type === 'arrow-fixed'
+    ? cell.dir : 'none';
+
+  if (!dir || dir === 'none') {
+    endGame('lost', 'blocked');
+    return;
+  }
+
+  const [dr, dc] = DIR_DELTA[dir];
+  const nr = state.playerR + dr;
+  const nc = state.playerC + dc;
+
+  // Boundary
+  if (nr < 0 || nr >= state.rows || nc < 0 || nc >= state.cols) {
+    endGame('lost', 'blocked');
+    return;
+  }
+
+  const next = state.grid[nr][nc];
+
+  // Wall
+  if (next.type === 'wall') {
+    endGame('lost', 'blocked');
+    return;
+  }
+
+  // Exit — win!
+  if (next.type === 'exit') {
+    state.grid[state.playerR][state.playerC].visited = true;
+    state.playerR = nr; state.playerC = nc;
+    state.moves++;
+    renderGrid();
+    endGame('won', '');
+    return;
+  }
+
+  // Loop detection
+  if (next.visited) {
+    endGame('lost', 'loop');
+    return;
+  }
+
+  // Move
+  state.grid[state.playerR][state.playerC].visited = true;
+  state.playerR = nr;
+  state.playerC = nc;
+  state.moves++;
+
+  updateHUD();
+  renderGrid();
+}
+
+// ═══════════════════════════════════════════════════════════
+// CLOCK
+// ═══════════════════════════════════════════════════════════
+function startClock() {
+  stopClock();
+  clockTimer = setInterval(() => {
+    if (state.status === 'running') {
+      state.secs++;
+      updateHUD();
+    }
+  }, 1000);
+}
+
+function stopClock()  { if (clockTimer) { clearInterval(clockTimer); clockTimer = null; } }
+function stopLoops()  { stopTick(); stopClock(); }
+
+// ═══════════════════════════════════════════════════════════
+// END GAME
+// ═══════════════════════════════════════════════════════════
+function endGame(result, reason) {
+  stopLoops();
+  state.status = result;
+
+  if (result === 'won') {
+    const lvl   = LEVELS[state.levelIdx];
+    const score = calcScore(lvl);
+    completedScores[lvl.id] = Math.max(completedScores[lvl.id] || 0, score);
+
+    // Unlock next level
+    if (state.levelIdx + 1 < LEVELS.length) {
+      unlockedLevels.add(LEVELS[state.levelIdx + 1].id);
+    }
+
+    showWinScreen(lvl, score);
+  } else {
+    // Lost
+    renderGrid();
+    const msg = reason === 'loop'
+      ? '🔄 Infinite loop! Fix the arrows and retry.'
+      : '💥 Path is blocked! No way forward.';
+    showBanner('status-banner', msg);
+    setMainBtn('retry');
+    document.getElementById('undo-btn').disabled = true;
+    document.getElementById('hint-btn').disabled = false;
+  }
+}
+
+function calcScore(lvl) {
+  const movePenalty = Math.max(0, state.moves - lvl.par) * 10;
+  const hintPenalty = state.hintsUsed * 50;
+  const timePenalty = Math.max(0, state.secs - lvl.par * 3) * 2;
+  return Math.max(0, SCORE_BASE - movePenalty - hintPenalty - timePenalty);
+}
+
+// ═══════════════════════════════════════════════════════════
+// WIN SCREEN
+// ═══════════════════════════════════════════════════════════
+function showWinScreen(lvl, score) {
+  const stars = score >= 900 ? 3 : score >= 600 ? 2 : 1;
+  document.getElementById('win-sub').textContent   = `${lvl.name} cleared`;
+  document.getElementById('win-stars').textContent =
+    '★'.repeat(stars) + '☆'.repeat(3 - stars);
+  document.getElementById('win-score').textContent = score;
+
+  const isLast = state.levelIdx === LEVELS.length - 1;
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.textContent = isLast ? '🎉 All Done!' : 'Next Level →';
+  nextBtn.disabled    = isLast;
+
+  showScreen('win-screen');
+}
+
+function goNextLevel() {
+  if (state.levelIdx + 1 < LEVELS.length) {
+    loadLevel(LEVELS[state.levelIdx + 1].id);
+  }
+}
+
+function replayLevel() {
+  loadLevel(LEVELS[state.levelIdx].id);
+}
+
+// ═══════════════════════════════════════════════════════════
+// HINT SYSTEM
+// ═══════════════════════════════════════════════════════════
+function doHint() {
+  if (state.status === 'running') return;
+  if (state.hintsUsed >= 3) {
+    showBanner('hint-banner', "No more hints! You can do this 💪");
+    return;
+  }
+
+  const result = simulate();
+  let msg = '';
+  let highlightR = -1, highlightC = -1;
+
+  if (result.outcome === 'win') {
+    msg = "✅ Your arrows look correct! Hit ▶ Start to run.";
+  } else if (result.outcome === 'blocked') {
+    const last = result.visited[result.visited.length - 1];
+    if (last) {
+      [highlightR, highlightC] = last;
+      msg = `🚧 Player gets stuck at row ${highlightR + 1}, col ${highlightC + 1}. Place an arrow there.`;
+    } else {
+      msg = LEVELS[state.levelIdx].hint;
+    }
+  } else {
+    // loop
+    const loopCell = findLoopEntry(result.visited);
+    if (loopCell) {
+      [highlightR, highlightC] = loopCell;
+      msg = `🔄 Loop detected near row ${highlightR + 1}, col ${highlightC + 1}. Change an arrow there.`;
+    } else {
+      msg = "🔄 You have an infinite loop. Check your arrows!";
+    }
+  }
+
+  state.hintsUsed++;
+  updateHUD();
+  showBanner('hint-banner', msg, true);
+
+  if (highlightR >= 0) highlightCell(highlightR, highlightC);
+}
+
+function findLoopEntry(visited) {
+  const seen = new Set();
+  for (const [r,c] of visited) {
+    const key = `${r},${c}`;
+    if (seen.has(key)) return [r,c];
+    seen.add(key);
+  }
+  return null;
+}
+
+function highlightCell(r, c) {
+  const gridEl = document.getElementById('game-grid');
+  const idx    = r * state.cols + c;
+  const el     = gridEl.children[idx];
+  if (el) {
+    el.classList.add('hinted');
+    setTimeout(() => el.classList.remove('hinted'), 3500);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PATH SIMULATOR (read-only dry run)
+// ═══════════════════════════════════════════════════════════
+function simulate() {
+  let r = state.startR, c = state.startC;
+  const visited    = [];
+  const visitedSet = new Set();
+  let steps = 0;
+
+  while (steps < MAX_STEPS) {
+    const cell = state.grid[r][c];
+    const dir  = cell.dir;
+
+    if (!dir || dir === 'none') {
+      if (cell.type !== 'exit') return { outcome:'blocked', visited };
+    }
+
+    visited.push([r, c]);
+    const stateKey = `${r},${c},${dir}`;
+    if (visitedSet.has(stateKey)) return { outcome:'loop', visited };
+    visitedSet.add(stateKey);
+
+    const [dr, dc] = DIR_DELTA[dir] || [0,0];
+    const nr = r + dr, nc = c + dc;
+
+    if (nr < 0 || nr >= state.rows || nc < 0 || nc >= state.cols)
+      return { outcome:'blocked', visited };
+
+    const next = state.grid[nr][nc];
+    if (next.type === 'wall')    return { outcome:'blocked', visited };
+    if (next.type === 'exit')    { visited.push([nr,nc]); return { outcome:'win', visited }; }
+
+    r = nr; c = nc; steps++;
+  }
+  return { outcome:'loop', visited };
+}
+
+// ═══════════════════════════════════════════════════════════
+// HUD + UI HELPERS
+// ═══════════════════════════════════════════════════════════
+function updateHUD() {
+  const lvl = LEVELS[state.levelIdx];
+  document.getElementById('game-level-name').textContent = lvl.name;
+  document.getElementById('game-stats').textContent =
+    `Moves: ${state.moves}  ·  Time: ${state.secs}s  ·  Hints: ${state.hintsUsed}`;
+}
+
+function setMainBtn(mode) {
+  const btn = document.getElementById('main-btn');
+  btn.className = 'main-btn ' + mode;
+  const labels = {
+    start:  '▶ Start',
+    pause:  '⏸ Pause',
+    resume: '▶ Resume',
+    retry:  '↺ Retry',
+  };
+  btn.textContent = labels[mode];
+}
+
+function showBanner(id, msg, isHint = false) {
+  hideBanners();
+  const el = document.getElementById(id);
+  el.style.display = 'flex';
+  el.innerHTML = `<span>${msg}</span><span class="dismiss" onclick="hideBanners()">✕</span>`;
+}
+
+function hideBanners() {
+  document.getElementById('status-banner').style.display = 'none';
+  document.getElementById('hint-banner').style.display   = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════
+function deepCloneGrid() {
+  return state.grid.map(row => row.map(cell => ({ ...cell })));
+}
+
+// Resize handler — recalculate cell size on orientation change
+window.addEventListener('resize', () => {
+  if (document.getElementById('game-screen').classList.contains('active')) {
+    renderGrid();
+  }
+});
+</script>
+</body>
+</html>
